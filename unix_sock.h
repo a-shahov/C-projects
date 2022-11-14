@@ -6,6 +6,8 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
+#include <unistd.h>
 
 #define BUF_SIZE 512
 
