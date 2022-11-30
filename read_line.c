@@ -1,9 +1,11 @@
-#include <stdio.h>
 #include <errno.h>
 #include <unistd.h>
 #include <tgmath.h>
 #include <fcntl.h>
+#include <string.h>
 #include "read_line.h"
+
+#include <stdio.h>
 
 #define true 1
 #define false 0
@@ -24,9 +26,9 @@ ssize_t read_line(int fd, void *buffer, size_t buf_length)
 {
     static struct rlb_struct rlbuf = {0}; 
     char *buf = NULL;
-    ssize_t numRead = 0;
+    ssize_t numWrite = 0;
     
-    if (buf_length <= 0 || buffer == NULL) {
+    if (buf_length <= 1 || buffer == NULL) {
         errno = EINVAL;
         return -1;
     }
@@ -40,18 +42,18 @@ ssize_t read_line(int fd, void *buffer, size_t buf_length)
                 return -1;
             } else if (rlbuf.next_char == rlbuf.end) {
                 *buf = '\0';
-                return numRead;
+                return numWrite;
             }
         }
         
         while (rlbuf.next_char != rlbuf.end) {
-            if (rlbuf.next_char == '\n') {
+            if (*rlbuf.next_char == '\n') {
                 *buf++ = *rlbuf.next_char++;
                 *buf = '\0';
-                return ++numRead;
-            } else if (numRead < buf_length + 1) {
+                return ++numWrite;
+            } else if ((size_t)numWrite < buf_length - 2) {
                 *buf++ = *rlbuf.next_char++;
-                ++numRead;
+                ++numWrite;
             } else {
                 rlbuf.next_char++;
             }
