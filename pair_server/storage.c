@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
+#include <errno.h>
 #include "mbedtls/sha256.h"
 
 #include <stdio.h>
@@ -11,6 +13,7 @@ static mbedtls_sha256_context ctx;
 
 struct cell {
     struct cell *next_cell;
+    struct cell *prev_cell;
     char key[64];
     char* value;
 };
@@ -45,9 +48,33 @@ end:
     return err;
 }
 
-int get_item(const char* key, char* out_value) 
+int get_item(const char* key, char* out_value, size_t out_len) 
 {
-    return 0;
+    int err = 0;
+    struct cell *current; 
+    unsigned long long hash;
+    
+    out_value = NULL;
+    
+    err = calculate_sha256(key, &hash);
+    if (err != 0) {
+        errno = EINVAL;
+        return err;
+    }
+
+    for (current = &hash_table[hash]; current != NULL; current = current->next_cell) {
+        if (strcmp(key, current->key) == 0) {
+            if (out_len >= strlen(current->value)) {
+                strcpy(out_value, current->value);
+                return 0;
+            } else {
+                errno = ENOMEM;
+                return -1;
+            }
+        }
+    }
+    
+    return -1;
 }
 
 int insert_item(const char* key, const char* value)
