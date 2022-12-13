@@ -12,13 +12,14 @@
 static mbedtls_sha256_context ctx; 
 
 struct cell {
+    unsigned char init_cell;
     struct cell *next_cell;
     struct cell *prev_cell;
     char key[64];
     char* value;
 };
 
-static struct cell hash_table[TABLE_SIZE];
+static struct cell hash_table[TABLE_SIZE] = {0};
 
 static int calculate_sha256(const unsigned char *key, unsigned long long *hash)
 {
@@ -62,7 +63,9 @@ int get_item(const char* key, char* out_value, size_t out_len)
         return err;
     }
 
-    for (current = &hash_table[hash]; current != NULL; current = current->next_cell) {
+    //Добавить обработку для элемента в массиве
+
+    for (current = current->next_cell; current != NULL; current = current->next_cell) {
         if (strcmp(key, current->key) == 0) {
             if (out_len >= strlen(current->value)) {
                 strcpy(out_value, current->value);
@@ -79,6 +82,39 @@ int get_item(const char* key, char* out_value, size_t out_len)
 
 int insert_item(const char* key, const char* value)
 {
+    int err = 0;
+    struct cell *current, *prev; 
+    unsigned long long hash;
+    
+    err = calculate_sha256(key, &hash);
+    if (err != 0) {
+        errno = EINVAL;
+        return err;
+    }
+    
+    current = &hash_table[hash];
+    
+    if (current->init_cell == 0) {
+        current->init_cell = 1;
+        strcpy(current->key, key);
+        free(current->value);
+        current->value = (char*)malloc(strlen(value) + 1);
+        strcpy(current->value, value);
+    } else {
+        while (current->next_cell) {
+            current = current->next_cell;
+        }
+        current->next_cell = (struct cell*)calloc(1, sizeof(struct cell));
+        prev = current;
+        current = current->next_cell;
+        
+        current->init_cell = 1;
+        current->prev_cell = prev;
+        strcpy(current->key, key);
+        current->value = (cahr*)malloc(strlen(value) + 1);
+        strcpy(current->value, value);
+    }
+    
     return 0;
 }
 
