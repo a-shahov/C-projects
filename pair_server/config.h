@@ -4,4 +4,7 @@
 #define INFO
 #define DEBUG
 
+/* for storage.c */
+#define TABLE_SIZE (4096)
+
 #endif

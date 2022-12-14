@@ -8,7 +8,6 @@
 #include "mbedtls/sha256.h"
 
 #define SHA256 (0)
-#define TABLE_SIZE (4096)
 
 #if defined(DEBUG) || defined(INFO)
 static const char *TAG = "STORAGE";
@@ -214,17 +213,4 @@ int pop_item(const char* key, char* out_value, size_t out_len)
     err = delete_item(key);
     
     return err;
-}
-
-int main()
-{
-    char buff[1024], *key = "gggggg";
-     
-    insert_item(key, "hdfihiudfhgiudfhguihdfuighdfuign\ndfdjfglkjdflkg\nfdlkhglkdfglkfhdgkj\noidfgjoidfjgoidfjgoi");
-    get_item(key, buff, 1024);
-    printf("%s\n\n", buff);
-    memset(buff, 0, 1024);
-    pop_item(key, buff, 1024);
-    printf("%s\n\n", buff);
-    return 0;
 }
