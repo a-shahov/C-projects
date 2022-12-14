@@ -57,7 +57,7 @@ end:
     return err;
 }
 
-int get_item(const char* key, char* out_value, size_t out_len) //Сообщать необходимую длину!
+int get_item(const char* key, char* out_value, size_t out_len, size_t *write_bytes) 
 {
     int err = 0;
     struct cell *current; 
@@ -77,10 +77,12 @@ int get_item(const char* key, char* out_value, size_t out_len) //Сообщат�
     }
 
     if (hash_table[hash].init_cell && strcmp(key, hash_table[hash].key) == 0) {
-        if (out_len >= strlen(hash_table[hash].value)) {
+        if (out_len > strlen(hash_table[hash].value)) {
             strcpy(out_value, hash_table[hash].value);
+            *write_bytes = strlen(hash_table[hash].value) + 1;
             return 0;
         } else {
+            *write_bytes = strlen(hash_table[hash].value) + 1;
             errno = ENOMEM;
 #ifdef DEBUG
             printf("%s: out of memory for out buffer in get_item\n", TAG);
@@ -93,8 +95,9 @@ int get_item(const char* key, char* out_value, size_t out_len) //Сообщат�
 
     for (;current != NULL; current = current->next_cell) {
         if (strcmp(key, current->key) == 0) {
-            if (out_len >= strlen(current->value)) {
+            if (out_len > strlen(current->value)) {
                 strcpy(out_value, current->value);
+                *write_bytes = strlen(hash_table[hash].value) + 1;
                 return 0;
             } else {
 #ifdef DEBUG
