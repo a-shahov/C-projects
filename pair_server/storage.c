@@ -199,9 +199,24 @@ int delete_item(const char* key)
     return -1;
 }
 
-int pop_item(const char* key, char* out_value)
+int pop_item(const char* key, char* out_value, size_t out_len)
 {
-    return 0;
+    int err = 0;
+
+#ifdef INFO
+    printf("%s: called pop_item\n", TAG);
+#endif
+
+    out_value = NULL;
+    
+    err = get_item(key, out_value, out_len);
+    if (err != 0) {
+        return -1;
+    }
+    
+    err = delete_item(key);
+    
+    return err;
 }
 
 int main()
