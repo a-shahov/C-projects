@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <stdio.h>
+#include "storage.h"
 #include "config.h"
 #include "mbedtls/sha256.h"
 
@@ -57,7 +58,7 @@ end:
     return err;
 }
 
-int get_item(const char* key, char* out_value, size_t out_len) 
+int get_item(const char* key, char* out_value, size_t out_len) //Сообщать необходимую длину!
 {
     int err = 0;
     struct cell *current; 
@@ -67,8 +68,6 @@ int get_item(const char* key, char* out_value, size_t out_len)
     printf("%s: called get_item\n", TAG);
 #endif
 
-    out_value = NULL;
-    
     err = calculate_sha256(key, &hash);
     if (err != 0) {
 #ifdef DEBUG
@@ -149,7 +148,7 @@ int insert_item(const char* key, const char* value)
         current->init_cell = 1;
         current->prev_cell = prev;
         strcpy(current->key, key);
-        current->value = (cahr*)malloc(strlen(value) + 1);
+        current->value = (char*)malloc(strlen(value) + 1);
         strcpy(current->value, value);
     }
     
@@ -190,7 +189,7 @@ int delete_item(const char* key)
             free(current);
             prev->next_cell = next;
             if (next) {
-                next->prev_cell = prev
+                next->prev_cell = prev;
             }
             return 0;
         }
@@ -206,8 +205,6 @@ int pop_item(const char* key, char* out_value, size_t out_len)
 #ifdef INFO
     printf("%s: called pop_item\n", TAG);
 #endif
-
-    out_value = NULL;
     
     err = get_item(key, out_value, out_len);
     if (err != 0) {
@@ -221,5 +218,13 @@ int pop_item(const char* key, char* out_value, size_t out_len)
 
 int main()
 {
+    char buff[1024], *key = "gggggg";
+     
+    insert_item(key, "hdfihiudfhgiudfhguihdfuighdfuign\ndfdjfglkjdflkg\nfdlkhglkdfglkfhdgkj\noidfgjoidfjgoidfjgoi");
+    get_item(key, buff, 1024);
+    printf("%s\n\n", buff);
+    memset(buff, 0, 1024);
+    pop_item(key, buff, 1024);
+    printf("%s\n\n", buff);
     return 0;
 }
