@@ -59,7 +59,7 @@ end:
     return err;
 }
 
-int get_item(const char* key, unsigned int user_id, char* out_value, size_t out_len, size_t *write_bytes) 
+int get_item(const char* key, unsigned int user_id, char* out_value, size_t out_len, size_t *write_bytes)
 {
     int err = 0;
     struct cell *current; 
@@ -78,7 +78,7 @@ int get_item(const char* key, unsigned int user_id, char* out_value, size_t out_
         return err;
     }
 
-    if (hash_table[hash].init_cell && strcmp(key, hash_table[hash].key) == 0) {
+    if (hash_table[hash].init_cell && hash_table[hash].user_id == user_id && strcmp(key, hash_table[hash].key) == 0) {
         if (out_len > strlen(hash_table[hash].value)) {
             strcpy(out_value, hash_table[hash].value);
             *write_bytes = strlen(hash_table[hash].value) + 1;
@@ -96,7 +96,7 @@ int get_item(const char* key, unsigned int user_id, char* out_value, size_t out_
     }
 
     for (;current != NULL; current = current->next_cell) {
-        if (strcmp(key, current->key) == 0) {
+        if (current->user_id == user_id && strcmp(key, current->key) == 0) {
             if (out_len > strlen(current->value)) {
                 strcpy(out_value, current->value);
                 *write_bytes = strlen(hash_table[hash].value) + 1;
@@ -139,12 +139,9 @@ int insert_item(const char* key, const char* value, unsigned int user_id)
         current->init_cell = 1;
         current->user_id = user_id;
         strcpy(current->key, key);
-        if (current->value == NULL) {
-            ++table_size;
-        } else {
-            free(current->value);
-        }
+        free(current->value);
         current->value = (char*)malloc(strlen(value) + 1);
+        ++table_size;
         if (!current->value) {
 #ifdef DEBUG
             printf("%s: malloc is failed in insert_item\n", TAG);
@@ -160,7 +157,7 @@ int insert_item(const char* key, const char* value, unsigned int user_id)
             }
             current = current->next_cell;
         }
-        if (current->next_cell == NULL) {
+        if (current->next_cell == NULL && (current->user_id != user_id || strcmp(key, current->key) != 0)) {
             current->next_cell = (struct cell*)calloc(1, sizeof(struct cell));
             if (!current->next_cell) {
 #ifdef DEBUG
@@ -207,6 +204,7 @@ int delete_item(const char* key, unsigned int user_id)
 
     if (hash_table[hash].init_cell && hash_table[hash].user_id == user_id && strcmp(key, hash_table[hash].key) == 0) {
         hash_table[hash].init_cell = 0; 
+        --table_size;
         return 0;
     } else {
         current = hash_table[hash].next_cell;
