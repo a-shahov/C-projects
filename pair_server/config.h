@@ -1,7 +1,7 @@
 #ifndef MY_CONFIG_H
 #define MY_CONFIG_H
 
-/* #define INFO */
+/* #define INFO_STORAGE */
 #define DEBUG
 
 /* for storage.c */

@@ -32,7 +32,7 @@ static int calculate_sha256(const unsigned char *key, unsigned long long *hash)
     int err = 0;
     unsigned char _hash[64];
 
-#ifdef INFO
+#ifdef INFO_STORAGE
     printf("%s: called calculate_sha256\n", TAG);
 #endif
 
@@ -65,7 +65,7 @@ int get_item(const char* key, unsigned int user_id, char* out_value, size_t out_
     struct cell *current; 
     unsigned long long hash;
 
-#ifdef INFO
+#ifdef INFO_STORAGE
     printf("%s: called get_item\n", TAG);
 #endif
 
@@ -120,7 +120,7 @@ int insert_item(const char* key, const char* value, unsigned int user_id)
     struct cell *current, *prev; 
     unsigned long long hash;
 
-#ifdef INFO
+#ifdef INFO_STORAGE
     printf("%s: called insert_item\n", TAG);
 #endif
     
@@ -189,7 +189,7 @@ int delete_item(const char* key, unsigned int user_id)
     struct cell *current, *prev, *next; 
     unsigned long long hash;
 
-#ifdef INFO
+#ifdef INFO_STORAGE
     printf("%s: called delete_item\n", TAG);
 #endif
 
@@ -232,7 +232,7 @@ int pop_item(const char* key, unsigned int user_id, char* out_value, size_t out_
 {
     int err = 0;
 
-#ifdef INFO
+#ifdef INFO_STORAGE
     printf("%s: called pop_item\n", TAG);
 #endif
     

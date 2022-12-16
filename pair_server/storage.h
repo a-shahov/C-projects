@@ -1,6 +1,5 @@
 #ifndef MY_STORAGE_H
 #define MY_STORAGE_H
-#include "config.h"
 
 int get_item(const char* key, unsigned int user_id, char* out_value, size_t out_len, size_t *write_bytes) ;
 int insert_item(const char* key, const char* value, unsigned int user_id);
