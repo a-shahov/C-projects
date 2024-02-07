@@ -1,0 +1,58 @@
+;
+; TouchscreenFilterDriver.inf
+;
+
+[Version]
+Signature = "$WINDOWS NT$"
+Class = %ClassName%
+ClassGuid = {745a17a0-74d3-11d0-b6fe-00a0c90f57da}
+Provider = %ManufacturerName%
+DriverVer = 
+CatalogFile = TouchscreenFilterDriver.cat
+PnpLockdown = 1
+
+
+[DefaultInstall.NT]
+CopyFiles = CopyClassFilters.NT
+AddReg = FilterAddReg.NT
+
+
+[DefaultInstall.NT.Services]
+AddService = TouchscreenFilterDriver,,FilterAddService
+
+
+[SourceDisksFiles]
+TouchscreenFilterDriver.sys = 1
+TouchscreenFilterDriver.inf = 1
+
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+
+[CopyClassFilters.NT]
+TouchscreenFilterDriver.sys;,,,0x00004000
+
+
+[FilterAddReg.NT]
+HKLM,%CLASSKEY%,"UpperFilters",0x00010008,"TouchscreenFilterDriver"
+
+
+[FilterAddService]
+DisplayName = %Touchscreen_ServiceDesc%
+ServiceType = 1   ; SERVICE_KERNEL_DRIVER
+StartType = 3     ; SERVICE_DEMAND_START
+ErrorControl = 1  ; SERVICE_ERROR_NORMAL
+ServiceBinary = %12%\TouchscreenFilterDriver.sys
+
+
+[Strings]
+ClassName = "HIDClass"
+CLASSKEY = "System\CurrentControlSet\Control\Class\{745a17a0-74d3-11d0-b6fe-00a0c90f57da}"
+ManufacturerName = "AZBOOKA" 
+DiskName = "TouchscreenFilterDriver Source Disk"
+Touchscreen_ServiceDesc = "TouchscreenFilterDriver"
